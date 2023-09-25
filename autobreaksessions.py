@@ -49,10 +49,10 @@ def main():
         auto = choice("AUTO MODE")
 
     asa = {
-        'host': '192.168.203.1',  # Cisco ASA settings
-        'username': 'bradmin',
-        'password': 'Hke84nHwtrV',
-        'secret': 'Ujd84kJe9o4',
+        'host': '',  # Cisco ASA settings
+        'username': '',
+        'password': '',
+        'secret': '',
         'device_type': 'cisco_asa',
         'fast_cli': False }
     timeout = 300  # seconds. No traffic timeout
