@@ -67,7 +67,7 @@ def main():
         sessions = connection.send_command("show vpn-sessiondb anyconnect")  # Get all sessions...
         users = re.findall(r"Username     : \S+", sessions)
         users = list(map(lambda x : x.replace("Username     : ", ""), users))
-        ips = re.findall(r"192.168.205.\d{0,3}", sessions)
+        ips = re.findall(r"192.168.XXX.\d{0,3}", sessions)  # REPLACE TO YOUR SUB-NET
         bytesTx = re.findall(r"Bytes Tx     : \d+", sessions)
         bytesTx = list(map(lambda x : int(x.replace("Bytes Tx     : ", "")), bytesTx))
         bytesRx = re.findall(r"Bytes Rx     : \d+", sessions)
@@ -81,10 +81,13 @@ def main():
                             if auto:
                                 connection.send_command("vpn-sessiondb logoff name " + users[i] + " noconfirm")  # Session logoff
                                 print(users[i], 'LOGOFF\n', ips[i], bytesTx[i], bytesRx[i], previousTx[ips[i]], previousRx[ips[i]])
+                                logging.info(users[i] + ' ' + 'LOGOFF' + ' ' + ips[i] + ' ' + bytesTx[i] + ' ' + bytesRx[i] + ' ' + previousTx[ips[i]] + ' ' + previousRx[ips[i]])
                             else:
+
                                 if choice(users[i] + 'LOGOFF'):  # If auto mode is enabled - ask user
                                     connection.send_command("vpn-sessiondb logoff name " + users[i] + " noconfirm")
                                     print(users[i], 'LOGOFF\n', ips[i], bytesTx[i], bytesRx[i], previousTx[ips[i]], previousRx[ips[i]])
+                                    logging.info(users[i] + ' ' + 'LOGOFF' + ' ' + ips[i] + ' ' + bytesTx[i] + ' ' + bytesRx[i] + ' ' + previousTx[ips[i]] + ' ' + previousRx[ips[i]])
                     previousTx[ips[i]] = bytesTx[i]  # Safe traffic info for next cycle
                     previousRx[ips[i]] = bytesRx[i]
                 except KeyError:
@@ -94,7 +97,7 @@ def main():
         else:
             print("PARSING ERROR\n\n", ips, users, bytesTx, bytesRx)
             sys.exit(0)  
-logging.basicConfig(level=logging.ERROR,
+logging.basicConfig(level=logging.INFO,
                     filename=os.getcwd() + '\\abs-' + datetime.datetime.strftime(datetime.datetime.today(), '%d%m%Y%H%M%S') + '.log')
 try:
     main()
