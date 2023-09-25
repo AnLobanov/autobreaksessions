@@ -49,10 +49,10 @@ def main():
         auto = choice("AUTO MODE")
 
     asa = {
-        'host': '',  # Cisco ASA settings
-        'username': '',
-        'password': '',
-        'secret': '',
+        'host': '192.168.203.1',  # Cisco ASA settings
+        'username': 'bradmin',
+        'password': 'Hke84nHwtrV',
+        'secret': 'Ujd84kJe9o4',
         'device_type': 'cisco_asa',
         'fast_cli': False }
     timeout = 300  # seconds. No traffic timeout
@@ -60,6 +60,7 @@ def main():
     connection.enable()
     connection.send_command('terminal length 0')
     print('CONNECTED')
+    logging.info('CONNECTED')
 
     previousTx = {}
     previousRx = {}
@@ -67,7 +68,7 @@ def main():
         sessions = connection.send_command("show vpn-sessiondb anyconnect")  # Get all sessions...
         users = re.findall(r"Username     : \S+", sessions)
         users = list(map(lambda x : x.replace("Username     : ", ""), users))
-        ips = re.findall(r"192.168.XXX.\d{0,3}", sessions)  # REPLACE TO YOUR SUB-NET
+        ips = re.findall(r"192.168.205.\d{0,3}", sessions)
         bytesTx = re.findall(r"Bytes Tx     : \d+", sessions)
         bytesTx = list(map(lambda x : int(x.replace("Bytes Tx     : ", "")), bytesTx))
         bytesRx = re.findall(r"Bytes Rx     : \d+", sessions)
@@ -98,7 +99,8 @@ def main():
             print("PARSING ERROR\n\n", ips, users, bytesTx, bytesRx)
             sys.exit(0)  
 logging.basicConfig(level=logging.INFO,
-                    filename=os.getcwd() + '\\abs-' + datetime.datetime.strftime(datetime.datetime.today(), '%d%m%Y%H%M%S') + '.log')
+                    filename=os.getcwd() + '\\abs-' + datetime.datetime.strftime(datetime.datetime.today(), '%d%m%Y%H%M%S') + '.log',
+                    format = "%(asctime)s - %(levelname)s - %(funcName)s: %(lineno)d - %(message)s")
 try:
     main()
 except Exception as e:
