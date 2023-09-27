@@ -68,7 +68,7 @@ def main():
         sessions = connection.send_command("show vpn-sessiondb anyconnect")  # Get all sessions...
         users = re.findall(r"Username     : \S+", sessions)
         users = list(map(lambda x : x.replace("Username     : ", ""), users))
-        ips = re.findall(r"192.168.205.\d{0,3}", sessions)
+        ips = re.findall(r"192.168.XXX.\d{0,3}", sessions)
         bytesTx = re.findall(r"Bytes Tx     : \d+", sessions)
         bytesTx = list(map(lambda x : int(x.replace("Bytes Tx     : ", "")), bytesTx))
         bytesRx = re.findall(r"Bytes Rx     : \d+", sessions)
@@ -76,19 +76,18 @@ def main():
         if len(users) == len(ips) == len(bytesTx) == len(bytesRx):  # If lists are correct
             for i in range(len(ips)):
                 try:
-                    if previousTx[ips[i]] == bytesTx[i] and previousRx[ips[i]] == bytesRx[i]:  # If the traffic has not changed
+                    if previousTx[ips[i]] == bytesTx[i] and previousRx[ips[i]] == bytesRx[i] or users[i] == "":  # If the traffic has not changed
                         ping = connection.send_command("ping " + ips[i], read_timeout=20)  # Check ping. If the host does not ping
                         if '!' not in ping:  
                             if auto:
                                 connection.send_command("vpn-sessiondb logoff name " + users[i] + " noconfirm")  # Session logoff
                                 print(users[i], 'LOGOFF\n', ips[i], bytesTx[i], bytesRx[i], previousTx[ips[i]], previousRx[ips[i]])
-                                logging.info(users[i] + ' ' + 'LOGOFF' + ' ' + ips[i] + ' ' + bytesTx[i] + ' ' + bytesRx[i] + ' ' + previousTx[ips[i]] + ' ' + previousRx[ips[i]])
+                                logging.info(users[i] + ' ' + 'LOGOFF' + ' ' + ips[i] + ' ' + str(bytesTx[i]) + ' ' + str(bytesRx[i]) + ' ' + str(previousTx[ips[i]]) + ' ' + str(previousRx[ips[i]]))
                             else:
-
                                 if choice(users[i] + 'LOGOFF'):  # If auto mode is enabled - ask user
                                     connection.send_command("vpn-sessiondb logoff name " + users[i] + " noconfirm")
                                     print(users[i], 'LOGOFF\n', ips[i], bytesTx[i], bytesRx[i], previousTx[ips[i]], previousRx[ips[i]])
-                                    logging.info(users[i] + ' ' + 'LOGOFF' + ' ' + ips[i] + ' ' + bytesTx[i] + ' ' + bytesRx[i] + ' ' + previousTx[ips[i]] + ' ' + previousRx[ips[i]])
+                                    logging.info(users[i] + ' ' + 'LOGOFF' + ' ' + ips[i] + ' ' + str(bytesTx[i]) + ' ' + str(bytesRx[i]) + ' ' + str(previousTx[ips[i]]) + ' ' + str(previousRx[ips[i]]))
                     previousTx[ips[i]] = bytesTx[i]  # Safe traffic info for next cycle
                     previousRx[ips[i]] = bytesRx[i]
                 except KeyError:
@@ -104,4 +103,4 @@ logging.basicConfig(level=logging.INFO,
 try:
     main()
 except Exception as e:
-    logging.error(e)
+    logging.error(e, exc_info=True)
